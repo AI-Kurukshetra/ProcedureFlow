@@ -1100,7 +1100,10 @@ function BillingForm({ onAdd }: { onAdd: (payload: BillingPayload) => void }) {
       <Input placeholder="CPT code" value={payload.cpt_code} onChange={(e) => setPayload({ ...payload, cpt_code: e.target.value })} />
       <Input placeholder="ICD code" value={payload.icd_code} onChange={(e) => setPayload({ ...payload, icd_code: e.target.value })} />
       <Textarea placeholder="Description" value={payload.description} onChange={(e) => setPayload({ ...payload, description: e.target.value })} />
-      <Select value={payload.status} onChange={(e) => setPayload({ ...payload, status: e.target.value })}>
+      <Select
+        value={payload.status}
+        onChange={(e) => setPayload({ ...payload, status: e.target.value as BillingPayload['status'] })}
+      >
         <option value="suggested">Suggested</option>
         <option value="confirmed">Confirmed</option>
         <option value="billed">Billed</option>
