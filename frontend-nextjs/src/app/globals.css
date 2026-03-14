@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+
+  /* Brand */
+  --primary:       #6366f1;
+  --primary-dark:  #4f46e5;
+  --primary-soft:  #eef2ff;
+  --purple:        #a855f7;
+  --pink:          #ec4899;
+  --accent:        #facc15;
+
+  /* Surfaces */
+  --background:    #f1f0f9;
+  --surface:       #ffffff;
+  --muted:         #64748b;
+  --border:        rgba(99,102,241,0.12);
+
+  /* Sidebar */
+  --sidebar-bg:    #1e1b4b;
+  --sidebar-text:  rgba(255,255,255,0.65);
+  --sidebar-active-bg: rgba(255,255,255,0.12);
+  --sidebar-hover-bg:  rgba(255,255,255,0.07);
+
+  /* Shadows */
+  --shadow-card:     0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(99,102,241,0.08);
+  --shadow-card-hover: 0 8px 30px rgba(99,102,241,0.22), 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-floating: 0 8px 32px rgba(99,102,241,0.18), 0 2px 8px rgba(0,0,0,0.1);
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--background);
+  color: #0f172a;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,h2,h3,h4,h5 {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+::selection {
+  background: #6366f1;
+  color: #fff;
+}
+
+/* ─── Gradient utilities ─────────────────────────────────── */
+.bg-primary-gradient {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+}
+.bg-secondary-gradient {
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+}
+.bg-app {
+  background: #f1f0f9;
+}
+
+/* ─── Sidebar dark ───────────────────────────────────────── */
+.sidebar-dark {
+  background: linear-gradient(180deg, #1e1b4b 0%, #16133a 100%);
+}
+
+/* ─── Card accent bar ────────────────────────────────────── */
+.card-accent {
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  margin: -24px -24px 20px -24px;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────── */
+html::-webkit-scrollbar-button, *::-webkit-scrollbar-button {
+  display: none; height: 0; width: 0;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99,102,241,0.25) transparent;
+}
+
+/* Form defaults */
+select {
+  appearance: none;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 16px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  color: #0f172a;
+  padding: 0.65rem 2.6rem 0.65rem 0.9rem;
+  font-size: 0.95rem;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+}
+
+select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+  outline: none;
+}
+
+select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background-color: #f8fafc;
+}

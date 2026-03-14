@@ -1,28 +1,85 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { ApiResponse } from '../models/template.model';
+import { Observable, from, map } from 'rxjs';
+import { SupabaseService } from './supabase.service';
 
 @Injectable({ providedIn: 'root' })
 export class BillingService {
-  private readonly apiUrl = `${environment.apiUrl}/billing`;
-
-  constructor(private http: HttpClient) {}
+  constructor(private supabase: SupabaseService) {}
 
   getSuggestions(procedureId: string): Observable<any[]> {
-    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/suggestions/${procedureId}`).pipe(map((r) => r.data));
+    return from(
+      this.supabase.client
+        .from('billing_codes')
+        .select('*')
+        .is('deleted_at', null)
+        .eq('procedure_id', procedureId)
+        .eq('status', 'suggested')
+        .order('created_at', { ascending: false })
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data || [];
+      })
+    );
   }
 
   create(billing: any): Observable<any> {
-    return this.http.post<ApiResponse<any>>(this.apiUrl, billing).pipe(map((r) => r.data));
+    return from(
+      this.supabase.client
+        .from('billing_codes')
+        .insert({
+          procedure_id: billing.procedureId || billing.procedure_id,
+          cpt_code: billing.cptCode || billing.cpt_code,
+          icd_code: billing.icdCode || billing.icd_code,
+          description: billing.description,
+          amount: billing.amount,
+          status: billing.status || 'suggested',
+        })
+        .select('*')
+        .single()
+    ).pipe(
+      map(({ data, error }) => {
+        if (error || !data) throw error || new Error('Failed to create billing entry');
+        return data;
+      })
+    );
   }
 
   getByProcedure(procedureId: string): Observable<any[]> {
-    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/procedure/${procedureId}`).pipe(map((r) => r.data));
+    return from(
+      this.supabase.client
+        .from('billing_codes')
+        .select('*')
+        .is('deleted_at', null)
+        .eq('procedure_id', procedureId)
+        .order('created_at', { ascending: false })
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data || [];
+      })
+    );
   }
 
   update(id: string, data: any): Observable<any> {
-    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/${id}`, data).pipe(map((r) => r.data));
+    return from(
+      this.supabase.client
+        .from('billing_codes')
+        .update({
+          cpt_code: data.cptCode || data.cpt_code,
+          icd_code: data.icdCode || data.icd_code,
+          description: data.description,
+          amount: data.amount,
+          status: data.status,
+        })
+        .eq('id', id)
+        .select('*')
+        .single()
+    ).pipe(
+      map(({ data: row, error }) => {
+        if (error || !row) throw error || new Error('Failed to update billing entry');
+        return row;
+      })
+    );
   }
 }
