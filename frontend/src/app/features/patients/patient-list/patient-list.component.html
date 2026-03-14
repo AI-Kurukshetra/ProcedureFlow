@@ -1,0 +1,76 @@
+<div class="app-layout">
+  <app-sidebar></app-sidebar>
+  <div class="main-content">
+    <app-navbar></app-navbar>
+    <div class="page-content">
+      <div class="page-header">
+        <h1>Patients</h1>
+        <button mat-raised-button color="primary" routerLink="/patients/new">
+          <mat-icon>person_add</mat-icon> New Patient
+        </button>
+      </div>
+
+      <mat-card>
+        <mat-card-content>
+          <mat-form-field appearance="outline" style="width:320px">
+            <mat-label>Search patients</mat-label>
+            <input matInput [(ngModel)]="search" (keyup.enter)="onSearch()" placeholder="Name or MRN...">
+            <mat-icon matSuffix (click)="onSearch()" style="cursor:pointer">search</mat-icon>
+          </mat-form-field>
+
+          <div *ngIf="loading" style="text-align:center;padding:40px">
+            <mat-spinner diameter="40"></mat-spinner>
+          </div>
+
+          <div class="table-container" *ngIf="!loading">
+            <mat-table [dataSource]="patients">
+              <ng-container matColumnDef="mrn">
+                <mat-header-cell *matHeaderCellDef>MRN</mat-header-cell>
+                <mat-cell *matCellDef="let p">{{ p.mrn }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+                <mat-cell *matCellDef="let p">{{ p.lastName }}, {{ p.firstName }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="dob">
+                <mat-header-cell *matHeaderCellDef>Date of Birth</mat-header-cell>
+                <mat-cell *matCellDef="let p">{{ p.dateOfBirth | date:'mediumDate' }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="gender">
+                <mat-header-cell *matHeaderCellDef>Gender</mat-header-cell>
+                <mat-cell *matCellDef="let p">{{ p.gender || '—' }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="phone">
+                <mat-header-cell *matHeaderCellDef>Phone</mat-header-cell>
+                <mat-cell *matCellDef="let p">{{ p.phone || '—' }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+                <mat-cell *matCellDef="let p" class="action-buttons">
+                  <button mat-icon-button [routerLink]="['/patients', p.id]" matTooltip="View">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  <button mat-icon-button [routerLink]="['/patients', p.id, 'edit']" matTooltip="Edit">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="primary" [routerLink]="['/procedures/new']" [queryParams]="{patientId: p.id}" matTooltip="New Procedure">
+                    <mat-icon>medical_services</mat-icon>
+                  </button>
+                </mat-cell>
+              </ng-container>
+              <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            </mat-table>
+
+            <mat-paginator
+              [length]="totalPatients"
+              [pageSize]="pageSize"
+              [pageSizeOptions]="[10, 20, 50]"
+              (page)="onPageChange($event)">
+            </mat-paginator>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

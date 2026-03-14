@@ -1,0 +1,196 @@
+<div class="app-layout">
+  <app-sidebar></app-sidebar>
+  <div class="main-content">
+    <app-navbar></app-navbar>
+    <div class="page-content">
+      <div class="page-header">
+        <h1>{{ isEdit ? procedure?.title || 'Procedure' : 'New Procedure' }}</h1>
+        <div class="header-actions">
+          <span *ngIf="lastSaved" class="autosave-info">Auto-saved {{ lastSaved | date:'shortTime' }}</span>
+          <span *ngIf="procedure" [class]="'status-badge ' + procedure.status">{{ procedure.status }}</span>
+          <button mat-stroked-button routerLink="/procedures">
+            <mat-icon>arrow_back</mat-icon> Back
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="loading" style="text-align:center;padding:60px">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loading">
+        <div class="proc-grid">
+          <div>
+            <mat-card>
+              <mat-card-header><mat-card-title>Procedure Details</mat-card-title></mat-card-header>
+              <mat-card-content>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Patient *</mat-label>
+                  <mat-select formControlName="patientId">
+                    <mat-option *ngFor="let patient of patients" [value]="patient.id">
+                      {{ patient.lastName }}, {{ patient.firstName }} ({{ patient.mrn }})
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>Required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Title *</mat-label>
+                  <input matInput formControlName="title">
+                  <mat-error>Required</mat-error>
+                </mat-form-field>
+
+                <div class="two-col">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Specialty *</mat-label>
+                    <mat-select formControlName="specialtyId" (selectionChange)="onSpecialtyChange($event.value)">
+                      <mat-option *ngFor="let specialty of specialties" [value]="specialty.id">
+                        {{ specialty.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Template</mat-label>
+                    <mat-select formControlName="templateId" (selectionChange)="onTemplateChange($event.value)">
+                      <mat-option value="">None</mat-option>
+                      <mat-option *ngFor="let template of templates" [value]="template.id">
+                        {{ template.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Procedure Date *</mat-label>
+                  <input matInput formControlName="procedureDate" type="date">
+                </mat-form-field>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card *ngIf="selectedTemplate">
+              <mat-card-header><mat-card-title>Template Data</mat-card-title></mat-card-header>
+              <mat-card-content [formGroup]="documentationGroup">
+                <div class="two-col">
+                  <ng-container *ngFor="let field of selectedTemplate.fields; trackBy: trackField">
+                    <mat-form-field
+                      *ngIf="field.type === 'text' || field.type === 'number' || field.type === 'date'"
+                      appearance="outline"
+                      class="full-width">
+                      <mat-label>{{ field.label }}</mat-label>
+                      <input
+                        matInput
+                        [type]="field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'"
+                        [formControlName]="field.id">
+                    </mat-form-field>
+
+                    <mat-form-field *ngIf="field.type === 'textarea'" appearance="outline" class="full-width">
+                      <mat-label>{{ field.label }}</mat-label>
+                      <textarea matInput rows="3" [formControlName]="field.id"></textarea>
+                    </mat-form-field>
+
+                    <mat-form-field
+                      *ngIf="field.type === 'select' || field.type === 'radio'"
+                      appearance="outline"
+                      class="full-width">
+                      <mat-label>{{ field.label }}</mat-label>
+                      <mat-select [formControlName]="field.id">
+                        <mat-option *ngFor="let option of field.options || []" [value]="option">
+                          {{ option }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+
+                    <div *ngIf="field.type === 'checkbox'" class="full-width template-checkbox">
+                      <mat-checkbox [formControlName]="field.id">{{ field.label }}</mat-checkbox>
+                    </div>
+                  </ng-container>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card>
+              <mat-card-header><mat-card-title>Documentation</mat-card-title></mat-card-header>
+              <mat-card-content>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Notes</mat-label>
+                  <textarea matInput formControlName="notes" rows="3"></textarea>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Findings</mat-label>
+                  <textarea matInput formControlName="findings" rows="4"></textarea>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Impression</mat-label>
+                  <textarea matInput formControlName="impression" rows="3"></textarea>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Complications</mat-label>
+                  <textarea matInput formControlName="complications" rows="2"></textarea>
+                </mat-form-field>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card *ngIf="isEdit">
+              <mat-card-header><mat-card-title>Images</mat-card-title></mat-card-header>
+              <mat-card-content>
+                <input type="file" #fileInput accept="image/*" multiple (change)="onFileSelected($event)" style="display:none">
+                <button type="button" mat-stroked-button (click)="fileInput.click()">
+                  <mat-icon>add_photo_alternate</mat-icon> Add Images
+                </button>
+                <div class="image-previews">
+                  <img *ngFor="let url of imagePreviewUrls" [src]="url" class="preview-img">
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+
+          <div>
+            <mat-card *ngIf="isEdit && procedure">
+              <mat-card-header><mat-card-title>Status</mat-card-title></mat-card-header>
+              <mat-card-content>
+                <div class="status-actions">
+                  <button
+                    type="button"
+                    mat-raised-button
+                    *ngFor="let status of getNextStatuses()"
+                    [color]="status === 'signed' ? 'accent' : 'primary'"
+                    (click)="changeStatus(status)">
+                    Move to {{ status | titlecase }}
+                  </button>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card *ngIf="billingCodes.length > 0">
+              <mat-card-header><mat-card-title>Billing Code Suggestions</mat-card-title></mat-card-header>
+              <mat-card-content>
+                <div *ngFor="let code of billingCodes" class="billing-item">
+                  <div class="billing-codes">
+                    <span class="cpt">CPT: {{ code.cptCode }}</span>
+                    <span class="icd">ICD: {{ code.icdCode }}</span>
+                  </div>
+                  <div class="billing-status">
+                    <span [class]="'status-badge ' + (code.source === 'confirmed' ? 'signed' : 'in-progress')">
+                      {{ code.source === 'confirmed' ? (code.status || 'confirmed') : 'suggested' }}
+                    </span>
+                  </div>
+                  <div>{{ code.description }}</div>
+                  <div class="billing-amount">${{ code.amount }}</div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" routerLink="/procedures">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="saving">
+            <mat-spinner *ngIf="saving" diameter="18"></mat-spinner>
+            {{ saving ? 'Saving...' : 'Save Procedure' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

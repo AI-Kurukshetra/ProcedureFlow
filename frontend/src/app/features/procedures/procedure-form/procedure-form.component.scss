@@ -1,0 +1,61 @@
+.proc-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+  align-items: start;
+}
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.autosave-info {
+  font-size: 12px;
+  color: #666;
+}
+.status-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.billing-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+}
+.billing-codes {
+  display: flex;
+  gap: 12px;
+  .cpt, .icd { font-family: monospace; font-weight: 600; }
+}
+.billing-amount { color: #43a047; font-weight: 600; }
+.billing-status { margin: 6px 0; }
+.template-checkbox {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+}
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+.image-previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.preview-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}

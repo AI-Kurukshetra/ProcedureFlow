@@ -1,0 +1,75 @@
+<div class="app-layout">
+  <app-sidebar></app-sidebar>
+  <div class="main-content">
+    <app-navbar></app-navbar>
+    <div class="page-content">
+      <div class="page-header"><h1>Analytics Dashboard</h1></div>
+
+      <div *ngIf="loading" style="text-align:center;padding:60px"><mat-spinner diameter="40"></mat-spinner></div>
+
+      <ng-container *ngIf="!loading">
+        <div class="stats-grid">
+          <mat-card class="stat-card">
+            <mat-card-content>
+              <mat-icon class="stat-icon">medical_services</mat-icon>
+              <div>
+                <div class="stat-value">{{ stats.totalProcedures || 0 }}</div>
+                <div class="stat-label">Total Procedures</div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="stat-card">
+            <mat-card-content>
+              <mat-icon class="stat-icon" style="color:#43a047">people</mat-icon>
+              <div>
+                <div class="stat-value">{{ stats.totalPatients || 0 }}</div>
+                <div class="stat-label">Total Patients</div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="stat-card">
+            <mat-card-content>
+              <mat-icon class="stat-icon" style="color:#ff9800">check_circle</mat-icon>
+              <div>
+                <div class="stat-value">{{ completionRates.completionRate || 0 }}%</div>
+                <div class="stat-label">Completion Rate</div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="stat-card">
+            <mat-card-content>
+              <mat-icon class="stat-icon" style="color:#9c27b0">star</mat-icon>
+              <div>
+                <div class="stat-value">{{ stats.avgQualityScore || 'N/A' }}</div>
+                <div class="stat-label">Avg Quality Score</div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <div class="charts-grid">
+          <mat-card>
+            <mat-card-header><mat-card-title>Procedures by Status</mat-card-title></mat-card-header>
+            <mat-card-content>
+              <div *ngFor="let item of procedureStats.byStatus" class="stat-row">
+                <span>{{ item.status | titlecase }}</span>
+                <strong>{{ item.count }}</strong>
+              </div>
+              <div *ngIf="!procedureStats.byStatus?.length" class="empty-state">No data available</div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card>
+            <mat-card-header><mat-card-title>Completion Summary</mat-card-title></mat-card-header>
+            <mat-card-content>
+              <div class="stat-row"><span>Total</span><strong>{{ completionRates.total || 0 }}</strong></div>
+              <div class="stat-row"><span>Completed</span><strong>{{ completionRates.completed || 0 }}</strong></div>
+              <div class="stat-row"><span>Signed</span><strong>{{ completionRates.signed || 0 }}</strong></div>
+              <div class="stat-row"><span>Completion Rate</span><strong>{{ completionRates.completionRate || 0 }}%</strong></div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
